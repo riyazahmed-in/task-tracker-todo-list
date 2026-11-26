@@ -2,7 +2,12 @@ const taskInput = document.getElementById("taskInput");
 const addTaskButton = document.getElementById("addTaskButton");
 const taskList = document.getElementById("taskList");
 
+const allTasksButton = document.getElementById("allTasksButton");
+const activeTasksButton = document.getElementById("activeTasksButton");
+const completedTasksButton = document.getElementById("completedTasksButton");
+
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let currentFilter = "all";
 
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -11,7 +16,19 @@ function saveTasks() {
 function displayTasks() {
   taskList.innerHTML = "";
 
-  tasks.forEach(function (task, index) {
+  const filteredTasks = tasks.filter(function (task) {
+    if (currentFilter === "active") {
+      return !task.completed;
+    }
+
+    if (currentFilter === "completed") {
+      return task.completed;
+    }
+
+    return true;
+  });
+
+  filteredTasks.forEach(function (task) {
     const taskItem = document.createElement("li");
 
     if (task.completed) {
@@ -22,7 +39,7 @@ function displayTasks() {
     taskText.textContent = task.text;
 
     taskText.addEventListener("click", function () {
-      tasks[index].completed = !tasks[index].completed;
+      task.completed = !task.completed;
       saveTasks();
       displayTasks();
     });
@@ -31,7 +48,10 @@ function displayTasks() {
     deleteButton.textContent = "Delete";
 
     deleteButton.addEventListener("click", function () {
-      tasks.splice(index, 1);
+      tasks = tasks.filter(function (item) {
+        return item !== task;
+      });
+
       saveTasks();
       displayTasks();
     });
@@ -57,6 +77,21 @@ addTaskButton.addEventListener("click", function () {
   saveTasks();
   displayTasks();
   taskInput.value = "";
+});
+
+allTasksButton.addEventListener("click", function () {
+  currentFilter = "all";
+  displayTasks();
+});
+
+activeTasksButton.addEventListener("click", function () {
+  currentFilter = "active";
+  displayTasks();
+});
+
+completedTasksButton.addEventListener("click", function () {
+  currentFilter = "completed";
+  displayTasks();
 });
 
 displayTasks();
