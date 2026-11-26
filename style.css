@@ -27,3 +27,16 @@ li {
   margin: 10px 0;
   padding: 10px;
 }
+
+.completed {
+  text-decoration: line-through;
+  color: gray;
+}
+
+li button {
+  margin-left: 15px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+}
