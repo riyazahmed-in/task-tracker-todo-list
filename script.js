@@ -2,6 +2,46 @@ const taskInput = document.getElementById("taskInput");
 const addTaskButton = document.getElementById("addTaskButton");
 const taskList = document.getElementById("taskList");
 
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function displayTasks() {
+  taskList.innerHTML = "";
+
+  tasks.forEach(function (task, index) {
+    const taskItem = document.createElement("li");
+
+    if (task.completed) {
+      taskItem.classList.add("completed");
+    }
+
+    const taskText = document.createElement("span");
+    taskText.textContent = task.text;
+
+    taskText.addEventListener("click", function () {
+      tasks[index].completed = !tasks[index].completed;
+      saveTasks();
+      displayTasks();
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+
+    deleteButton.addEventListener("click", function () {
+      tasks.splice(index, 1);
+      saveTasks();
+      displayTasks();
+    });
+
+    taskItem.appendChild(taskText);
+    taskItem.appendChild(deleteButton);
+    taskList.appendChild(taskItem);
+  });
+}
+
 addTaskButton.addEventListener("click", function () {
   const taskText = taskInput.value.trim();
 
@@ -9,23 +49,14 @@ addTaskButton.addEventListener("click", function () {
     return;
   }
 
-  const taskItem = document.createElement("li");
-  taskItem.textContent = taskText;
-
-  taskItem.addEventListener("click", function () {
-    taskItem.classList.toggle("completed");
+  tasks.push({
+    text: taskText,
+    completed: false
   });
 
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "Delete";
-
-  deleteButton.addEventListener("click", function (event) {
-    event.stopPropagation();
-    taskItem.remove();
-  });
-
-  taskItem.appendChild(deleteButton);
-  taskList.appendChild(taskItem);
-
+  saveTasks();
+  displayTasks();
   taskInput.value = "";
 });
+
+displayTasks();
